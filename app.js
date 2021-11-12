@@ -58,7 +58,7 @@ app.use(sslRedirect());
 const mongoURI =
   "mongodb+srv://ankit:" +
   process.env.mongo_pass +
-  "@cluster0.f8aql.mongodb.net/mravans_admin_v1?retryWrites=true&w=majority";
+  "@cluster0.f8aql.mongodb.net/mravans_admin_v2?retryWrites=true&w=majority";
 //Mongo connection
 mongoose.connect(mongoURI);
 
