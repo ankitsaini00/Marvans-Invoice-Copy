@@ -8,7 +8,7 @@ var router = express.Router({ mergeParams: true }),
     Iphone=require("../../models/iphone"),
     Iwatch = require("../../models/iwatch"),
     {nodemailerSendEmailAll}=require("../../nodemailer/nodemailer.js"),
-    {sendSmsAll}=require("../../msg91/sendmsg"),
+    {sendSmsAll, sendWhatsApp}=require("../../msg91/sendmsg"),
     Ipod = require("../../models/ipod");
     fs=require("fs"),
     ejs=require("ejs"),
@@ -193,7 +193,11 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                                 res.redirect("back")
                             } else {
                                 // console.log(order.products1[0]._id)
-    
+                                // Mapping prod desc to order
+
+                                const allProducts = order.products1.map( item => item.ctpin+item.name+" "+item.desc+`\r\n`);
+                                const message = `Thank you for your purchase at Marvans. You have done total payment of Rs. ${order.total_paid} for purchase of \r\n ${allProducts.toString().trim()}. \r\n On name of : ${order.customer.name}`;
+                                sendWhatsApp(message,parseInt(`91${order.customer.mobile}`));
                                 createPDF(order,res,req);
                                 
                             }

@@ -33,5 +33,30 @@ module.exports = {
       })
     })
 
+  },
+async sendWhatsApp(message, number) {
+    // console.log(number);
+    const numberCheck = await axios.post(
+      `https://api.chat-api.com/${process.env.whatsapp_instance}/contacts?token=${process.env.whatsapp_token}`, 
+    {
+        blocking: "wait",
+        force_check: true,
+        contacts: [`+${number}`]
+      });
+    // console.log(numberCheck); 
+    console.log(numberCheck.data);
+    if(numberCheck.data.contacts[0].status == "valid"){
+      // console.log('here');
+      const resp = await axios.post(
+        `https://api.chat-api.com/${process.env.whatsapp_instance}/sendMessage?token=${process.env.whatsapp_token}`,
+      {
+        body : message,
+        phone  : number
+      });
+      console.log(resp.data);
+    }
+    else {
+      return false;
+    }
   }
 }
