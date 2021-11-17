@@ -46,6 +46,20 @@ async sendWhatsApp(message, number) {
     // console.log(numberCheck); 
     console.log(numberCheck.data);
     if(numberCheck.data.contacts[0].status == "valid"){
+      const template = await axios.post(
+        `https://api.chat-api.com/${process.env.whatsapp_instance}/sendTemplate?token=${process.env.whatsapp_token}`, 
+          {          
+            template: "greeting_message",
+            language: {
+            "policy": "deterministic",
+            "code": "en"
+            }, 
+            namespace: "521bac4a_4623_4a26_9ccc_6db1db9fa73a",
+            chatId : "",
+            phone: number
+          }
+      );
+      console.log(template.data);
       // console.log('here');
       const resp = await axios.post(
         `https://api.chat-api.com/${process.env.whatsapp_instance}/sendMessage?token=${process.env.whatsapp_token}`,
