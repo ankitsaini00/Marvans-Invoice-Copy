@@ -34,43 +34,33 @@ module.exports = {
     })
 
   },
-async sendWhatsApp(message, number) {
-    // console.log(number);
-    const numberCheck = await axios.post(
-      `https://api.chat-api.com/${process.env.whatsapp_instance}/contacts?token=${process.env.whatsapp_token}`, 
-    {
-        blocking: "wait",
-        force_check: true,
-        contacts: [`+${number}`]
-      });
-    // console.log(numberCheck); 
-    console.log(numberCheck.data);
-    if(numberCheck.data.contacts[0].status == "valid"){
-      const template = await axios.post(
-        `https://api.chat-api.com/${process.env.whatsapp_instance}/sendTemplate?token=${process.env.whatsapp_token}`, 
-          {          
-            template: "greeting_message",
-            language: {
-            "policy": "deterministic",
-            "code": "en"
-            }, 
-            namespace: "521bac4a_4623_4a26_9ccc_6db1db9fa73a",
-            chatId : "",
-            phone: number
-          }
-      );
-      console.log(template.data);
-      // console.log('here');
-      const resp = await axios.post(
-        `https://api.chat-api.com/${process.env.whatsapp_instance}/sendMessage?token=${process.env.whatsapp_token}`,
-      {
-        body : message,
-        phone  : number
-      });
-      console.log(resp.data);
+async sendWhatsApp(billName, billItems, billAmount , number) {
+  const headers = {
+    'apiSecret': process.env.gallaApi_secretKey,
+    'apiKey': process.env.gallaApiKey
+  }
+  const data = {
+    "channelId": process.env.channelId,
+    "channelType": "whatsapp",
+    "context": {
+        "type": "notification"
+    },
+    "recipient": {
+        "name": `${billName}`,
+        "phone": `${number}`
+    },
+    "whatsapp": {
+        "type": "template",
+        "template": {
+            "templateName": "offline_purchase_confirmation",
+            "bodyValues": {
+                "name": `${billName}`,
+                "product_items": `${billItems}`,
+                "amount": `${billAmount}`            }
+        }
     }
-    else {
-      return false;
-    }
+  };
+  const abc = await axios.post('https://server.gallabox.com/devapi/messages/whatsapp', data,{headers: headers});
+  console.log(abc.data);
   }
 }

@@ -196,8 +196,9 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                                 // Mapping prod desc to order
 
                                 const allProducts = order.products1.map( item => item.ctpin+'- '+item.name+" "+item.desc+`\r\n`);
-                                const message = `Thank you for your purchase at Marvans. You have done total payment of Rs. ${order.total_paid} for purchase of \r\n ${allProducts.toString().trim()}. \r\n On name of : ${order.customer.name}`;
-                                sendWhatsApp(message,parseInt(`91${order.customer.mobile}`));
+                                // const message = `Thank you for your purchase at Marvans. You have done total payment of Rs. ${order.total_paid} for purchase of \r\n ${allProducts.toString().trim()}. \r\n On name of : ${order.customer.name}`;
+                                const allProducts1 = allProducts.toString().trim();
+                                sendWhatsApp(order.customer.name, allProducts1, order.total_paid, parseInt(`91${order.customer.mobile}`));
                                 createPDF(order,res,req);
 
                             }
