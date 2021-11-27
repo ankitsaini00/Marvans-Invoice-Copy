@@ -195,10 +195,28 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                                 // console.log(order.products1[0]._id)
                                 // Mapping prod desc to order
 
-                                const allProducts = order.products1.map( item => item.ctpin+'- '+item.name+" "+item.desc+`\r\n`);
+                                const allProducts = order.products1.map( item => item.ctpin+'- '+item.name+" "+item.desc);
                                 // const message = `Thank you for your purchase at Marvans. You have done total payment of Rs. ${order.total_paid} for purchase of \r\n ${allProducts.toString().trim()}. \r\n On name of : ${order.customer.name}`;
                                 const allProducts1 = allProducts.toString().trim();
-                                sendWhatsApp(order.customer.name, allProducts1, order.total_paid, parseInt(`91${order.customer.mobile}`));
+                                sendWhatsApp(order.customer.name, allProducts1, order.total_paid, `91${order.customer.mobile}`);
+                                let orderAccumulated = []; 
+                                order.products1.forEach(item => {
+                                    if(orderAccumulated.some(e => (e.name == item.name && e.desc == item.desc))) {
+                                        orderAccumulated.forEach((vt) => {
+                                            // console.log(vt);
+                                            if(vt.name === item.name && vt.desc === item.desc)
+                                            {  
+                                                vt.quantity++;
+                                                vt.details = vt.details.toString().concat(',', item.details); 
+                                            }
+                                    });
+                                    }
+                                    else{
+                                        orderAccumulated.push(item);
+                                    }
+                                });
+                                order.products1 = orderAccumulated; 
+                                console.log(orderAccumulated);
                                 createPDF(order,res,req);
 
                             }
