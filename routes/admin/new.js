@@ -49,6 +49,25 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                     if(order.isPaid){
                        res.redirect("/allorders")
                     }else{
+                        let orderAccumulated = []; 
+                        order.products1.forEach(item => {
+                            if(orderAccumulated.some(e => (e.name == item.name && e.desc == item.desc))) {
+                                orderAccumulated.forEach((vt) => {
+                                    // console.log(vt);
+                                    if(vt.name === item.name && vt.desc === item.desc)
+                                    {  
+                                        vt.quantity+=item.quantity;
+                                        vt.details = vt.details.toString().concat(',', item.details);
+                                        vt.price+=item.price; 
+                                    }
+                            }); 
+                            }
+                            else{
+                                orderAccumulated.push(item);
+                            }
+                        });
+                        order.products1 = orderAccumulated;  
+                        // console.log(orderAccumulated);
                         order.products1.forEach((p)=>{
                             if(p.product=="1"){
                                 Iphone.findOne({pid:p.product_id},(err,phone)=>{
@@ -199,24 +218,6 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                                 // const message = `Thank you for your purchase at Marvans. You have done total payment of Rs. ${order.total_paid} for purchase of \r\n ${allProducts.toString().trim()}. \r\n On name of : ${order.customer.name}`;
                                 const allProducts1 = allProducts.toString().trim();
                                 sendWhatsApp(order.customer.name, allProducts1, order.total_paid, `91${order.customer.mobile}`);
-                                let orderAccumulated = []; 
-                                order.products1.forEach(item => {
-                                    if(orderAccumulated.some(e => (e.name == item.name && e.desc == item.desc))) {
-                                        orderAccumulated.forEach((vt) => {
-                                            // console.log(vt);
-                                            if(vt.name === item.name && vt.desc === item.desc)
-                                            {  
-                                                vt.quantity++;
-                                                vt.details = vt.details.toString().concat(',', item.details); 
-                                            }
-                                    });
-                                    }
-                                    else{
-                                        orderAccumulated.push(item);
-                                    }
-                                });
-                                order.products1 = orderAccumulated; 
-                                console.log(orderAccumulated);
                                 createPDF(order,res,req);
 
                             }
