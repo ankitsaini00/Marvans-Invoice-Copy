@@ -49,26 +49,32 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                     if(order.isPaid){
                        res.redirect("/allorders")
                     }else{
-                        let orderAccumulated = []; 
-                        order.products1.forEach(item => {
+
+
+                        let orderAccumulated = new Array();
+                        let dummyArray = order.products1.map(a => ({...a}));
+                        for(let i=0;i<dummyArray.length;i++)
+                            {
+                                let item = dummyArray[i];
                             if(orderAccumulated.some(e => (e.name == item.name && e.desc == item.desc))) {
                                 orderAccumulated.forEach((vt) => {
                                     // console.log(vt);
                                     if(vt.name === item.name && vt.desc === item.desc)
                                     {  
                                         vt.quantity+=item.quantity;
-                                        vt.details = vt.details.toString().concat(',', item.details);
-                                        vt.price+=item.price; 
                                     }
                             }); 
                             }
                             else{
                                 orderAccumulated.push(item);
                             }
-                        });
-                        order.products1 = orderAccumulated;  
+                        }
+
+
+                        // originalOrder =  order.products1;
+                        // order.products1 = orderAccumulated;  
                         // console.log(orderAccumulated);
-                        order.products1.forEach((p)=>{
+                        orderAccumulated.forEach((p)=>{
                             if(p.product=="1"){
                                 Iphone.findOne({pid:p.product_id},(err,phone)=>{
                                     if(err){
@@ -115,7 +121,9 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                                     }
                                 })
                             }
-                        })
+                        });
+
+                        
                         order.payment_type = req.body.payment_type;
                         order.advance = Number(req.body.advance);
                         order.customer.name=req.body.username;
@@ -139,6 +147,7 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                                })
                             } 
                         }
+                        // console.log('here5');
                         Admin.findOne({},(err,admin)=>{
                             var mail=[],sms=[],str="";
                             order.products1.forEach((p)=>{
@@ -205,19 +214,24 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
                             sendSmsAll(sms);
                         })
                         order.customer.save();
+
+                        
                         order.save((err) => {
                             if (err) {
                                 console.log(err)
                                 req.flash("error", "Database Error")
                                 res.redirect("back")
                             } else {
-                                // console.log(order.products1[0]._id)
+                                // console.log(order.products1);
+
                                 // Mapping prod desc to order
 
                                 const allProducts = order.products1.map( item => item.ctpin+'- '+item.name+" "+item.desc);
                                 // const message = `Thank you for your purchase at Marvans. You have done total payment of Rs. ${order.total_paid} for purchase of \r\n ${allProducts.toString().trim()}. \r\n On name of : ${order.customer.name}`;
                                 const allProducts1 = allProducts.toString().trim();
                                 sendWhatsApp(order.customer.name, allProducts1, order.total_paid, `91${order.customer.mobile}`);
+                                // console.log('here7');
+                                // console.log(order.products1);
                                 createPDF(order,res,req);
 
                             }

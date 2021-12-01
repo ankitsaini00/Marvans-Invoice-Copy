@@ -322,55 +322,68 @@ module.exports = {
                     res.redirect("back");
                   } else {
                     if (invoice) {
-                      var orderid = Math.floor(Math.random() * 90000) + 10000;
-                      while (invoice.ctpins.includes(orderid)) {
-                        orderid = Math.floor(Math.random() * 90000) + 10000;
-                      }
-                      invoice.ctpins.push(orderid);
+                      // var orderid = Math.floor(Math.random() * 90000) + 10000;
+                      // while (invoice.ctpins.includes(orderid)) {
+                      //   orderid = Math.floor(Math.random() * 90000) + 10000;
+                      // }
+                      // invoice.ctpins.push(orderid);
+                      let [newInvoice, ctPin] = newCTPIN(invoice,req.body.quantity);
+                      invoice = newInvoice;
                       invoice.save();
                       var detail = req.body.name.split(",");
                       let tempMyPrice = 0;
 
+                      let prodDetails = req.body.details.concat(',').split(',');
                       if (req.body.type == "1") {
                         Iphone.findOne(
                           { name: detail[0], pid: detail[1] },
                           (err, prod) => {
-                            for (let i = 0; i < prod.variants.length; i++) {
-                              if (prod.variants[i].storage == req.body.desc) {
-                                tempMyPrice =
-                                  prod.variants[i].my_price != null
-                                    ? prod.variants[i].my_price
-                                    : 0;
-                                break;
+                            // console.log(req.body.quantity);
+                            for(let j=0; j< req.body.quantity; j++){
+                              for (let i = 0; i < prod.variants.length; i++) {
+                                if (prod.variants[i].storage == req.body.desc) {
+                                  tempMyPrice =
+                                    prod.variants[i].my_price != null
+                                      ? prod.variants[i].my_price
+                                      : 0;
+                                  break;
+                                }
                               }
+                                impFunction(ctPin[j],prodDetails[j]);
                             }
-                            impFunction();
+                            saveOrder();
                           }
                         );
                       } else if (req.body.type == "2") {
                         Iwatch.findOne(
                           { name: detail[0], pid: detail[1] },
                           (err, prod) => {
-                            for (let i = 0; i < prod.variants.length; i++) {
-                              if (
-                                prod.variants[i].size == req.body.size &&
-                                prod.variants[i].type == req.body.desc
-                              ) {
-                                tempMyPrice =
-                                  prod.variants[i].my_price != null
-                                    ? prod.variants[i].my_price
-                                    : 0;
-                                break;
+                            for(let j=0;i < req.body.quantity ; j++){
+                              for (let i = 0; i < prod.variants.length; i++) {
+                                if (
+                                  prod.variants[i].size == req.body.size &&
+                                  prod.variants[i].type == req.body.desc
+                                ) {
+                                  tempMyPrice =
+                                    prod.variants[i].my_price != null
+                                      ? prod.variants[i].my_price
+                                      : 0;
+                                  break;
+                                }
                               }
+                              impFunction(ctPin[j],prodDetails[j]);
                             }
-                            impFunction();
+                            saveOrder();
                           }
                         );
                       } else if (req.body.type == "3") {
                         Ipod.findOne({ name: detail[0] }, (err, prod) => {
+                         for(let i = 0; i < req.body.quantity; i++){
                           tempMyPrice =
-                            prod.my_price != null ? prod.my_price : 0;
-                          impFunction();
+                          prod.my_price != null ? prod.my_price : 0;
+                          impFunction(ctPin[i],prodDetails[j]); 
+                         }
+                         saveOrder();
                         });
                       }
 
@@ -386,7 +399,7 @@ module.exports = {
                         return price - dis;
                       }
 
-                      function impFunction() {
+                      function impFunction(ctPinFromIndex,prodDesc) {
                         if (req.body.type == "2") {
                           order.products1.push({
                             vou: getVoucher(Number(req.body.price)),
@@ -394,11 +407,11 @@ module.exports = {
                             name: detail[0],
                             product: req.body.type,
                             desc: req.body.desc + "," + req.body.size,
-                            details: req.body.details,
-                            quantity: Number(req.body.quantity),
+                            details: prodDesc,
+                            quantity: 1,
                             price: Number(req.body.price),
                             my_price: Number(tempMyPrice), //
-                            ctpin: orderid,
+                            ctpin: ctPinFromIndex,
                           });
                         } else {
                           order.products1.push({
@@ -407,13 +420,17 @@ module.exports = {
                             name: detail[0],
                             product: req.body.type,
                             desc: req.body.desc,
-                            details: req.body.details,
-                            quantity: Number(req.body.quantity),
+                            details: prodDesc,
+                            quantity: 1,
                             price: Number(req.body.price),
                             my_price: Number(tempMyPrice),
-                            ctpin: orderid,
+                            ctpin: ctPinFromIndex,
                           });
                         }
+                        // console.log(order.products1);
+                      }
+                      
+                      function saveOrder () {
                         order.save((err) => {
                           if (err) {
                             console.log(err);
@@ -553,4 +570,18 @@ module.exports = {
       res.redirect("/");
     }
   },
+};
+
+
+const newCTPIN = (invoiceList, n) => {
+  let ctpinList = [];
+  for (var i = 0; i < n; i++) {
+    ctpin = Math.floor(Math.random() * 90000) + 10000;
+    while (invoiceList.ctpins.includes(ctpin)) {
+      ctpin = Math.floor(Math.random() * 90000) + 10000;
+    }
+    invoiceList.ctpins.push(ctpin);
+    ctpinList.push(ctpin);
+  }
+  return [invoiceList,ctpinList];
 };
