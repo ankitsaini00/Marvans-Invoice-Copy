@@ -54,11 +54,16 @@ app.use(sslRedirect());
 // mongoose.connect("mongodb://localhost/stickman_real_art");
 // const mongoURI = "mongodb://localhost/stickman_apple_v1";
 // const mongoURI = "mongodb+srv://ankit:"+process.env.MLAB_PASS+"@cluster0-gyowo.mongodb.net/real_art?retryWrites=true&w=majority";
-//
+// //
+// const mongoURI =
+//   "mongodb+srv://ankit:" +
+//   process.env.mongo_pass +
+//   "@cluster0.f8aql.mongodb.net/mravans_admin_v2?retryWrites=true&w=majority";
+
 const mongoURI =
-  "mongodb+srv://ankit:" +
+  "mongodb+srv://ankitoffline:" +
   process.env.mongo_pass +
-  "@cluster0.f8aql.mongodb.net/mravans_admin_v2?retryWrites=true&w=majority";
+  "@cluster0.uscyw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 //Mongo connection
 mongoose.connect(mongoURI);
 
