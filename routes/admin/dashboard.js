@@ -105,6 +105,7 @@ router.get("/print-pdf/:oid", isAdmin, (req, res) => {
 });
 
 router.get("/download/:date", isAdmin, (req, res) => {
+  try{
   console.log(req.params);
   if (req.params.date) {
     var dt = req.params.date;
@@ -201,9 +202,13 @@ router.get("/download/:date", isAdmin, (req, res) => {
     req.flash("error", "invalid url");
     res.redirect("back");
   }
+}catch (err) {
+  next(err);
+}
 });
 
 router.get("/invoices_download/:date", isAdmin, (req, res) => {
+  try{
   console.log(req.params);
   if (req.params.date) {
     var dt = req.params.date;
@@ -235,6 +240,9 @@ router.get("/invoices_download/:date", isAdmin, (req, res) => {
     req.flash("error", "invalid url");
     res.redirect("back");
   }
+}catch (err) {
+  next(err);
+}
 });
 
 // function to generate pdf

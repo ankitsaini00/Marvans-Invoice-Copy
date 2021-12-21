@@ -37,6 +37,7 @@ router.get("/delete/:oid/:pid",isAdmin, f5aNew);
 
 // @route to print-pdf
 router.post("/create-pdf/:oid",isAdmin,(req, res) => {
+    try {
     if (req.params.oid.match(/^[0-9a-fA-F]{24}$/)) {
         Order.findOne({ _id: req.params.oid, isOnline: false }).populate("customer").exec((err, order) => {
             if (err) {
@@ -252,6 +253,9 @@ router.post("/create-pdf/:oid",isAdmin,(req, res) => {
         req.flash("error", "Invalid URL")
         res.redirect("/")
     }
+}catch (err) {
+    next(err);
+  } 
 
 })
 
