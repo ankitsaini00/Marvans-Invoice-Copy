@@ -291,6 +291,7 @@ async function createPDF( bill, res,req) {
 
     const browser = await puppeteer.launch({
         args: ['--no-sandbox'],
+        executablePath: '/usr/bin/chromium-browser',
         headless: true
     });
 
