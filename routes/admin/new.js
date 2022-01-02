@@ -290,7 +290,7 @@ async function createPDF( bill, res,req) {
 	}
 
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: ['--use-gl=egl'],
         headless: true
     });
 

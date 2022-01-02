@@ -273,7 +273,7 @@ async function createPDF2(products, dt, res, req) {
   };
 
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
+    args: ["--use-gl=egl"],
     headless: true,
   });
 
@@ -317,7 +317,7 @@ async function createPDF(bill, res, req) {
   };
 
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
+    args: ["--use-gl=egl"],
     headless: true,
   });
 
@@ -361,7 +361,7 @@ async function createPDF3(bills, dt, res, req) {
   };
 
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
+    args: ["--use-gl=egl"],
     headless: true,
   });
 
