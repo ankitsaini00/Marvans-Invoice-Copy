@@ -49,6 +49,7 @@ async sendWhatsApp(billName, billItems, billAmount , number) {
         "name": `${billName}`,
         "phone": `${number}`
     },
+    "botId": "61980d26506f0200049c71da",
     "whatsapp": {
         "type": "template",
         "template": {
